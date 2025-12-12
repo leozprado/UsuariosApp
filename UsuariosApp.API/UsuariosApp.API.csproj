@@ -11,4 +11,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\UsuariosApp.Domain\UsuariosApp.Domain.csproj" />
+    <ProjectReference Include="..\UsuariosApp.Infra.Data\UsuariosApp.Infra.Data.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -47,6 +47,15 @@ namespace UsuariosApp.Infra.Data.Mappings
                 .HasColumnName("DATAHORACRIACAO")
                 .IsRequired();
 
+            builder.Property(u => u.PerfilId)
+                .HasColumnName("PERFIL_ID")
+                .IsRequired();
+
+            //Mapeamento do relacionamento entre Usuario e Perfil (1 para muitos)
+            builder.HasOne(u => u.Perfil) //um usuário tem um perfil
+                .WithMany(p => p.Usuarios) //um perfil tem muitos usuários
+                .HasForeignKey(u => u.PerfilId); //chave estrangeira na tabela usuário               
+
         }
     }
 }
