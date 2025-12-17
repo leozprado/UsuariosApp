@@ -38,41 +38,61 @@ namespace UsuariosApp.Domain.Services
                 throw new ValidationException(result.Errors);
             }
 
-            //verificar se já existe um usuário com o email cadastrado
+            //Verificar se já existe outro usuário com o email cadastrado
             if (usuarioRepository.Get(usuario.Email) != null)
             {
-                throw new ApplicationException("Já existe um usuário cadastrado com o email informado.");
+                throw new ApplicationException("O email informado já está cadastrado. Tente outro.");
             }
-
 
             //Criptografar a senha do usuário
-            usuario.Senha = CryptoHelper.ToSha256(request.senha);
+            usuario.Senha = CryptoHelper.ToSha256(usuario.Senha);
 
-            //consultando o perfil "OPERADOR" no banco de dados
+            //Consultando o perfil 'OPERADOR' no banco de dados
             var perfil = perfilRepository.Get("OPERADOR");
 
-            //caso o perfil não exista, iremos cria-lo
+            //Caso o perfil não existe, iremos cria-lo
             if (perfil == null)
             {
-                perfil = new Perfil() {Nome = "OPERADOR"};
-                perfilRepository.Add(perfil);                
+                perfil = new Perfil() { Nome = "OPERADOR" };
+                perfilRepository.Add(perfil);
             }
 
-            //Associar o usuario ao perfil de operador
-            usuario.PerfilId = perfil.Id;
+            //Associar o usuário ao perfil de operador
+            usuario.PerfilId = perfil.Id; //chave estrangeira
 
-
-            //Salvar o usuário no banco de dados
+            //Salvar no banco de dados
             usuarioRepository.Add(usuario);
 
-            //RETORNAR OS DADOS DE RESPOSTA (response)
+            //Retornar os dados do usuário criado
             return new CriarContaResponse(
-                usuario.Id,
-                usuario.Nome,
-                usuario.Email,
-                usuario.DataHoraCriacao
-          );
+                    usuario.Id, //Id do usuário
+                    usuario.Nome, //Nome do usuário
+                    usuario.Email, //Email do usuário
+                    usuario.DataHoraCriacao //Data e hora de criação
+                );
+        }
 
+        public AutenticarResponse Autenticar(AutenticarRequest request)
+        {
+            //Buscar o usuário no banco de dados baseado no email e na senha.
+            var usuario = usuarioRepository.Get(request.email, CryptoHelper.ToSha256(request.senha));
+
+            //verificar se o usuário não foi encontrado
+            if (usuario == null)
+            {
+                throw new ApplicationException("Acesso negado. Usuário inválido.");
+            }
+
+            //retornar os dados do usuário autenticado
+            return new AutenticarResponse(
+                    usuario.Id, //Id do usuário
+                    usuario.Nome, //Nome do usuario
+                    usuario.Email, //Email do usuário
+                    usuario.Perfil?.Nome, //Nome do perfil do usuário
+                    DateTime.Now, //Data e hora de acesso
+                    DateTime.Now.AddHours(1), //Data e hora de expiração
+                    "<<TOKEN>>" //TOKEN do JWT (Fazer!)
+                );
         }
     }
 }
