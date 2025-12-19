@@ -31,3 +31,7 @@ app.UseSwaggerUI(); //Swagger
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+
+//declarando a classe program.cs como publica   
+public partial class Program { }

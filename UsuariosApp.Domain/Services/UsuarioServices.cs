@@ -83,6 +83,10 @@ namespace UsuariosApp.Domain.Services
                 throw new ApplicationException("Acesso negado. Usuário inválido.");
             }
 
+            //gerar o token JWT
+            var token = JwtHelper.GenerateToken(usuario.Email, usuario.Perfil?.Nome ?? string.Empty);
+
+
             //retornar os dados do usuário autenticado
             return new AutenticarResponse(
                     usuario.Id, //Id do usuário
@@ -90,8 +94,8 @@ namespace UsuariosApp.Domain.Services
                     usuario.Email, //Email do usuário
                     usuario.Perfil?.Nome, //Nome do perfil do usuário
                     DateTime.Now, //Data e hora de acesso
-                    DateTime.Now.AddHours(1), //Data e hora de expiração
-                    "<<TOKEN>>" //TOKEN do JWT (Fazer!)
+                    DateTime.Now.AddHours(2), //Data e hora de expiração
+                    token // Token JWT
                 );
         }
     }
